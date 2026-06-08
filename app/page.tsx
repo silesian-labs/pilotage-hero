@@ -16,7 +16,6 @@ import {
   FinalCTA,
   Footer
 } from '../components/sections';
-
 interface ConnectModalProps {
   onClose: () => void;
   onConnect: () => void;
@@ -33,11 +32,11 @@ function ConnectModal({ onClose, onConnect }: ConnectModalProps) {
     <div className="modal-veil" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-          <h3 className="h-2" style={{ fontSize: 22 }}>Come aboard</h3>
+          <h3 className="h2" style={{ fontSize: 22 }}>Come aboard</h3>
           <button className="btn btn-ghost btn-sm" onClick={onClose} style={{ padding: 8 }}><Icon name="x" size={16} /></button>
         </div>
         <p style={{ color: 'var(--ink-2)', fontSize: 14.5, marginBottom: 8 }}>
-          Connect a wallet to deploy your vault. Pilotage never takes custody — your keys stay yours.
+          Connect a wallet to deploy your vault. Pilotage never takes custody, your keys stay yours.
         </p>
         {wallets.map(([n, e, c]) => (
           <button key={n} className="wallet-opt" onClick={onConnect}>
@@ -79,7 +78,7 @@ export default function Home() {
       <Builders />
       <Ecosystem />
       <FinalCTA onConnect={onConnect} />
-      <Footer />
+      {/* <Footer /> */}
 
       {modal && <ConnectModal onClose={() => setModal(false)} onConnect={doConnect} />}
     </>

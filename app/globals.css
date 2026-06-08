@@ -97,7 +97,7 @@ body::before{
 body.no-grain::before{ display:none; }
 
 /* ---- Layout ---- */
-.wrap{ width:100%; max-width:var(--maxw); margin:0 auto; padding:0 28px; position:relative; z-index:1; }
+.wrap{ width:100%; margin:0; padding:0 28px; position:relative; z-index:1; }
 .section{ position:relative; padding:96px 0; }
 .section.tight{ padding:64px 0; }
 
@@ -112,8 +112,8 @@ body.no-grain::before{ display:none; }
 
 h1,h2,h3,h4{ font-family:var(--font-display); font-weight:700; line-height:1.04; letter-spacing:-.02em; color:var(--ink); }
 .h-display{ font-size:clamp(40px,6vw,78px); font-weight:800; letter-spacing:-.035em; }
-.h-1{ font-size:clamp(32px,4.2vw,52px); letter-spacing:-.03em; }
-.h-2{ font-size:clamp(24px,2.6vw,33px); }
+.h1{ font-size:clamp(32px,4.2vw,52px); letter-spacing:-.03em; }
+.h2{ font-size:clamp(24px,2.6vw,33px); }
 .lead{ font-size:clamp(17px,1.5vw,20px); color:var(--ink-2); line-height:1.6; }
 .deep h1,.deep h2,.deep h3,.deep h4{ color:var(--deep-ink); }
 .deep .lead{ color:var(--deep-ink-2); }
@@ -235,7 +235,6 @@ h1,h2,h3,h4{ font-family:var(--font-display); font-weight:700; line-height:1.04;
   .hero-scrim{ display:none; }
   .hero-overlay{ position:static; }
   .hero-copy{ max-width:none; text-align:center; margin:0 auto; padding:0 0 6px; }
-  .hero-copy .kicker, .hero-copy .glass-pill{ }
   .hero-scroll{ display:none; }
 }
 @media (max-width:760px){
@@ -317,7 +316,6 @@ h1,h2,h3,h4{ font-family:var(--font-display); font-weight:700; line-height:1.04;
 .pilot-name{ font-family:var(--font-display); font-weight:700; font-size:17px; line-height:1.1; }
 .pilot-handle{ font-family:var(--font-mono); font-size:11.5px; color:var(--ink-3); }
 .pilot-stats{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; padding-top:4px; }
-.pstat{ }
 .pstat .k{ font-family:var(--font-mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3); }
 .pstat .v{ font-family:var(--font-mono); font-weight:700; font-size:16px; color:var(--ink); margin-top:2px; }
 .pstat .v.pos{ color:var(--pos); }
@@ -376,7 +374,7 @@ h1,h2,h3,h4{ font-family:var(--font-display); font-weight:700; line-height:1.04;
 .wave.up path{ fill:var(--paper); }
 
 /* ---- Section heading block ---- */
-.sec-head{ max-width:720px; margin-bottom:48px; }
+.sec-head{ max-width:960px; margin-bottom:48px; }
 .sec-head .lead{ margin-top:16px; }
 .sec-head.center{ margin-left:auto; margin-right:auto; text-align:center; }
 .sec-head.center .kicker{ justify-content:center; }

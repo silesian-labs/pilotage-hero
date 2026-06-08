@@ -42,14 +42,8 @@ export function Nav({ onConnect, connected }: NavProps) {
           {links.map(([t, h]) => <a key={t} className="nav-link" href={h}>{t}</a>)}
         </div>
         <div className="nav-spacer" />
-        <a className="btn btn-ghost btn-sm" href="#builders" style={{ marginRight: 4 }}>
-          <Icon name="code" size={16} /> Build a pilot
-        </a>
-        <button className="btn btn-primary btn-sm" onClick={onConnect}>
-          {connected
-            ? <><span className="mono">0xA4…ce2f</span></>
-            : <><Icon name="anchor" size={15} /> Connect wallet</>}
-        </button>
+
+
       </div>
     </nav>
   );
@@ -99,7 +93,7 @@ export function Hero({ onConnect }: HeroProps) {
             </span>
           </span>
           <h1 className="h-display reveal d1">
-            Where capital<br />finds its <span style={{ color: 'var(--accent)', position: 'relative', whiteSpace: 'nowrap' }}>
+            Where capitan<br />finds its <span style={{ color: 'var(--accent)', position: 'relative', whiteSpace: 'nowrap' }}>
               pilot
               <svg viewBox="0 0 200 14" preserveAspectRatio="none" style={{ position: 'absolute', left: 0, right: 0, bottom: -6, width: '100%', height: 12 }}>
                 <path d="M2 9 C 50 2 150 2 198 8" fill="none" stroke="var(--accent)" strokeWidth="3" strokeLinecap="round" opacity=".55" />
@@ -108,7 +102,7 @@ export function Hero({ onConnect }: HeroProps) {
           </h1>
           <p className="lead reveal d2" style={{ marginTop: 26, maxWidth: 470 }}>
             The marketplace for autonomous capital management. Deploy a
-            non-custodial vault, hand a pilot a narrow charter, and keep the helm —
+            non-custodial vault, hand a pilot a narrow charter, and keep the helm,
             zero custody, zero trust assumptions.
           </p>
           <div className="reveal d3" style={{ display: 'flex', gap: 14, marginTop: 32, flexWrap: 'wrap' }}>
@@ -130,10 +124,6 @@ export function Hero({ onConnect }: HeroProps) {
 
 
 
-      <div className="hero-scroll">
-        <span>Scroll</span>
-        <Icon name="arrow" size={16} style={{ transform: 'rotate(90deg)' }} />
-      </div>
     </header>
   );
 }
@@ -170,8 +160,8 @@ export function Problem() {
       <div className="wrap">
         <div className="sec-head center reveal">
           <span className="kicker">The third option</span>
-          <h2 className="h-1" style={{ marginTop: 18 }}>Holding tokenized assets in 2026<br />means choosing between two bad options.</h2>
-          <p className="lead">$50B+ in real-world assets are on-chain. The operational layer to manage them safely doesn't exist yet — so today you either babysit a spreadsheet or surrender your keys.</p>
+          <h2 className="h1" style={{ marginTop: 18 }}>Holding tokenized assets in 2026<br />means choosing between two bad options.</h2>
+          <p className="lead">$50B+ in real-world assets are on-chain. The operational layer to manage them safely doesn't exist yet, so today you either babysit a spreadsheet or surrender your keys.</p>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'stretch', gap: 20, flexWrap: 'wrap', justifyContent: 'center' }}>
@@ -200,7 +190,7 @@ export function Problem() {
               <Icon name="check" size={22} style={{ color: 'var(--pos)' }} />
             </div>
             <h3 style={{ fontSize: 20, margin: '16px 0 8px' }}>Pilot it with Pilotage</h3>
-            <p style={{ color: 'var(--ink-2)', fontSize: 14.5 }}>Keep your vault, your keys, and the helm. A pilot navigates within a charter you sign — and can never sail outside it.</p>
+            <p style={{ color: 'var(--ink-2)', fontSize: 14.5 }}>Keep your vault, your keys, and the helm. A pilot navigates within a charter you sign, and can never sail outside it.</p>
           </div>
         </div>
       </div>
@@ -213,8 +203,8 @@ export function Problem() {
 // ==========================================
 export function Pillars() {
   const items = [
-    { ic: 'lock', n: '01', t: 'Non-custodial vaults', d: 'You deploy your own smart-contract vault. Only you hold the keys. One “withdraw all” and funds return to your wallet — Pilotage has zero privileged calls.' },
-    { ic: 'key', n: '02', t: 'Permissioned pilots', d: 'Sign an ERC-7715 charter: which contracts, which amounts, how often, what slippage. A pilot physically cannot act outside it — every attempt reverts on-chain.' },
+    { ic: 'lock', n: '01', t: 'Non-custodial vaults', d: 'You deploy your own smart-contract vault. Only you hold the keys. One “withdraw all” and funds return to your wallet, Pilotage has zero privileged calls.' },
+    { ic: 'key', n: '02', t: 'Permissioned pilots', d: 'Sign an ERC-7715 charter: which contracts, which amounts, how often, what slippage. A pilot physically cannot act outside it, every attempt reverts on-chain.' },
     { ic: 'badge', n: '03', t: 'On-chain Pilotage Score', d: 'Every passage, every rebalance, every off-course is recorded via ERC-8004. Pilots compete on a public track record, not on marketing.' },
   ];
   return (
@@ -222,7 +212,7 @@ export function Pillars() {
       <div className="wrap">
         <div className="sec-head reveal">
           <span className="kicker">Three joined parts</span>
-          <h2 className="h-1" style={{ marginTop: 18 }}>Pick your pilot. Set the charter.<br />Keep the helm.</h2>
+          <h2 className="h1" style={{ marginTop: 18 }}>Pick your pilot. Set the charter.<br />Keep the helm.</h2>
         </div>
         <div className="pillar-grid">
           {items.map((it, i) => (
@@ -278,7 +268,7 @@ export function LiveDemo() {
   const alloc: Record<string, number> = { aUSDC: usdc, TSLA: tsla };
   const score = step >= 4 ? 87.1 : 87.0;
   const statusLabel = step >= 4 ? ['Safe passage', 'var(--pos)']
-    : step >= 1 ? ['Off-course — correcting', 'var(--warn)']
+    : step >= 1 ? ['Off-course, correcting', 'var(--warn)']
       : ['On course', 'var(--pos)'];
 
   return (
@@ -286,10 +276,10 @@ export function LiveDemo() {
       <Wave />
       <section className="section deep" id="demo">
         <div className="wrap">
-          <div className="sec-head reveal" style={{ maxWidth: 760 }}>
+          <div className="sec-head reveal" style={{ maxWidth: 960 }}>
             <span className="kicker">Watch the helm</span>
-            <h2 className="h-1" style={{ marginTop: 18 }}>The market moves. The pilot acts.<br />You don't lift a finger.</h2>
-            <p className="lead">Drop the price of tokenized Tesla and watch a pilot detect the drift, validate against its charter, and navigate back on course — on-chain, in seconds, inside the rails you signed.</p>
+            <h2 className="h1" style={{ marginTop: 18 }}>The market moves. The pilot acts.<br />You don't lift a finger.</h2>
+            <p className="lead">Drop the price of tokenized Tesla and watch a pilot detect the drift, validate against its charter, and navigate back on course, on-chain, in seconds, inside the rails you signed.</p>
           </div>
 
           <div className="demo-grid">
@@ -474,10 +464,10 @@ export function Harbor({ onHire }: HarborProps) {
   return (
     <section className="section" id="harbor">
       <div className="wrap">
-        <div className="sec-head reveal" style={{ marginBottom: 32, maxWidth: 760 }}>
+        <div className="sec-head reveal" style={{ marginBottom: 32, maxWidth: 960 }}>
           <span className="kicker">The harbor</span>
-          <h2 className="h-1" style={{ marginTop: 18 }}>Browse pilots ranked by reputation,<br />not by marketing budget.</h2>
-          <p className="lead">Filter by risk, chain, and asset class. Every number here is computed from on-chain history — no wallet required to look around.</p>
+          <h2 className="h1" style={{ marginTop: 18 }}>Browse pilots ranked by reputation,<br />not by marketing budget.</h2>
+          <p className="lead">Filter by risk, chain, and asset class. Every number here is computed from on-chain history, no wallet required to look around.</p>
         </div>
 
         <div className="harbor-toolbar reveal">
@@ -526,16 +516,16 @@ interface HowItWorksProps {
 export function HowItWorks({ onConnect }: HowItWorksProps) {
   const steps = [
     { ic: 'compass', n: 'Step 01', t: 'Browse the harbor', d: 'Compare pilots by Pilotage Score, track record, drawdown, and compliance. Pick one that fits your waters.' },
-    { ic: 'scroll', n: 'Step 02', t: 'Sign one charter', d: 'Set asset weights, venues, slippage and daily limits. One ERC-7715 signature — gas sponsored, no ETH required.' },
+    { ic: 'scroll', n: 'Step 02', t: 'Sign one charter', d: 'Set asset weights, venues, slippage and daily limits. One ERC-7715 signature, gas sponsored, no ETH required.' },
     { ic: 'coins', n: 'Step 03', t: 'Fund the vault', d: 'Deposit USDC or RWA into a vault only you can open. The pilot wakes the moment funds arrive.' },
     { ic: 'wheel', n: 'Step 04', t: 'Keep the helm', d: 'Watch passages in real time. Revoke the pilot or withdraw everything in a single transaction, anytime.' },
   ];
   return (
     <section className="section tight">
       <div className="wrap">
-        <div className="sec-head reveal" style={{ maxWidth: 720 }}>
+        <div className="sec-head reveal" style={{ maxWidth: 960 }}>
           <span className="kicker">For captains</span>
-          <h2 className="h-1" style={{ marginTop: 18 }}>From browsing to safe passage<br />in four steps.</h2>
+          <h2 className="h1" style={{ marginTop: 18 }}>From browsing to safe passage<br />in four steps.</h2>
         </div>
         <div className="steps">
           {steps.map((s, i) => (
@@ -569,9 +559,9 @@ export function Builders() {
   return (
     <section className="section deep" id="builders">
       <div className="wrap">
-        <div className="sec-head reveal" style={{ maxWidth: 760 }}>
+        <div className="sec-head reveal" style={{ maxWidth: 960 }}>
           <span className="kicker">Pilot House · for builders</span>
-          <h2 className="h-1" style={{ marginTop: 18 }}>Anyone can build a pilot.<br />The harbor is open.</h2>
+          <h2 className="h1" style={{ marginTop: 18 }}>Anyone can build a pilot.<br />The harbor is open.</h2>
           <p className="lead">Write a strategy against the SDK, deploy your executor, stake, and register. Earn 70% of performance fees and carry a portable, on-chain reputation between ports.</p>
         </div>
 
@@ -587,26 +577,26 @@ export function Builders() {
               <span className="fn mono">my-pilot.ts</span>
             </div>
             <pre><code>
-<span className="tok-kw">import</span> <span className="tok-pun">{'{'}</span> Pilot<span className="tok-pun">,</span> Strategy <span className="tok-pun">{'}'}</span> <span className="tok-kw">from</span> <span className="tok-str">'@pilotage/pilot-sdk'</span>{'\n\n'}
-<span className="tok-kw">const</span> strategy<span className="tok-pun">:</span> <span className="tok-fn">Strategy</span> <span className="tok-pun">=</span> <span className="tok-pun">{'{'}</span>{'\n'}
-{'  '}name<span className="tok-pun">:</span> <span className="tok-str">'SimpleRebalancer'</span><span className="tok-pun">,</span>{'\n'}
-{'  '}risk<span className="tok-pun">:</span> <span className="tok-str">'conservative'</span><span className="tok-pun">,</span>{'\n'}
-{'  '}<span className="tok-kw">async</span> <span className="tok-fn">decide</span><span className="tok-pun">(</span>state<span className="tok-pun">,</span> market<span className="tok-pun">)</span> <span className="tok-pun">{'{'}</span>{'\n'}
-{'    '}<span className="tok-com">// stay inside the charter you were given</span>{'\n'}
-{'    '}<span className="tok-kw">const</span> drift <span className="tok-pun">=</span> state<span className="tok-pun">.</span><span className="tok-fn">computeDrift</span><span className="tok-pun">(</span><span className="tok-kw">this</span><span className="tok-pun">.</span>charter<span className="tok-pun">.</span>targets<span className="tok-pun">)</span>{'\n'}
-{'    '}<span className="tok-kw">if</span> <span className="tok-pun">(</span>drift <span className="tok-pun">&gt;</span> <span className="tok-num">0.05</span><span className="tok-pun">)</span>{'\n'}
-{'      '}<span className="tok-kw">return</span> <span className="tok-pun">{'{'}</span> type<span className="tok-pun">:</span> <span className="tok-str">'rebalance'</span><span className="tok-pun">,</span> to<span className="tok-pun">:</span> <span className="tok-kw">this</span><span className="tok-pun">.</span>charter<span className="tok-pun">.</span>targets <span className="tok-pun">{'}'}</span>{'\n'}
-{'    '}<span className="tok-kw">return</span> <span className="tok-pun">{'{'}</span> type<span className="tok-pun">:</span> <span className="tok-str">'hold'</span> <span className="tok-pun">{'}'}</span>{'\n'}
-{'  '}<span className="tok-pun">{'}'}</span><span className="tok-pun">,</span>{'\n'}
-<span className="tok-pun">{'}'}</span>{'\n\n'}
-<span className="tok-kw">new</span> <span className="tok-fn">Pilot</span><span className="tok-pun">(</span>strategy<span className="tok-pun">)</span><span className="tok-pun">.</span><span className="tok-fn">run</span><span className="tok-pun">()</span>
+              <span className="tok-kw">import</span> <span className="tok-pun">{'{'}</span> Pilot<span className="tok-pun">,</span> Strategy <span className="tok-pun">{'}'}</span> <span className="tok-kw">from</span> <span className="tok-str">'@pilotage/pilot-sdk'</span>{'\n\n'}
+              <span className="tok-kw">const</span> strategy<span className="tok-pun">:</span> <span className="tok-fn">Strategy</span> <span className="tok-pun">=</span> <span className="tok-pun">{'{'}</span>{'\n'}
+              {'  '}name<span className="tok-pun">:</span> <span className="tok-str">'SimpleRebalancer'</span><span className="tok-pun">,</span>{'\n'}
+              {'  '}risk<span className="tok-pun">:</span> <span className="tok-str">'conservative'</span><span className="tok-pun">,</span>{'\n'}
+              {'  '}<span className="tok-kw">async</span> <span className="tok-fn">decide</span><span className="tok-pun">(</span>state<span className="tok-pun">,</span> market<span className="tok-pun">)</span> <span className="tok-pun">{'{'}</span>{'\n'}
+              {'    '}<span className="tok-com">// stay inside the charter you were given</span>{'\n'}
+              {'    '}<span className="tok-kw">const</span> drift <span className="tok-pun">=</span> state<span className="tok-pun">.</span><span className="tok-fn">computeDrift</span><span className="tok-pun">(</span><span className="tok-kw">this</span><span className="tok-pun">.</span>charter<span className="tok-pun">.</span>targets<span className="tok-pun">)</span>{'\n'}
+              {'    '}<span className="tok-kw">if</span> <span className="tok-pun">(</span>drift <span className="tok-pun">&gt;</span> <span className="tok-num">0.05</span><span className="tok-pun">)</span>{'\n'}
+              {'      '}<span className="tok-kw">return</span> <span className="tok-pun">{'{'}</span> type<span className="tok-pun">:</span> <span className="tok-str">'rebalance'</span><span className="tok-pun">,</span> to<span className="tok-pun">:</span> <span className="tok-kw">this</span><span className="tok-pun">.</span>charter<span className="tok-pun">.</span>targets <span className="tok-pun">{'}'}</span>{'\n'}
+              {'    '}<span className="tok-kw">return</span> <span className="tok-pun">{'{'}</span> type<span className="tok-pun">:</span> <span className="tok-str">'hold'</span> <span className="tok-pun">{'}'}</span>{'\n'}
+              {'  '}<span className="tok-pun">{'}'}</span><span className="tok-pun">,</span>{'\n'}
+              <span className="tok-pun">{'}'}</span>{'\n\n'}
+              <span className="tok-kw">new</span> <span className="tok-fn">Pilot</span><span className="tok-pun">(</span>strategy<span className="tok-pun">)</span><span className="tok-pun">.</span><span className="tok-fn">run</span><span className="tok-pun">()</span>
             </code></pre>
           </div>
 
           {/* register + fee split */}
           <div className="reveal d2" style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
             <div className="card" style={{ padding: 24 }}>
-              <h3 className="h-2" style={{ fontSize: 19, marginBottom: 16 }}>Register a pilot</h3>
+              <h3 className="h2" style={{ fontSize: 19, marginBottom: 16 }}>Register a pilot</h3>
               {[
                 ['npm install', '@pilotage/pilot-sdk'],
                 ['Deploy', 'your executor contract'],
@@ -623,7 +613,7 @@ export function Builders() {
 
             <div className="card" style={{ padding: 24 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 12 }}>
-                <h3 className="h-2" style={{ fontSize: 19 }}>Performance fee split</h3>
+                <h3 className="h2" style={{ fontSize: 19 }}>Performance fee split</h3>
                 <span className="mono" style={{ fontSize: 11.5, color: 'var(--deep-ink-3)' }}>on profit only</span>
               </div>
               <div className="split-bar">
@@ -651,9 +641,9 @@ export function Ecosystem() {
   return (
     <section className="section tight deep" id="standards" style={{ paddingTop: 8 }}>
       <div className="wrap">
-        <div className="sec-head reveal" style={{ maxWidth: 700 }}>
+        <div className="sec-head reveal" style={{ maxWidth: 960 }}>
           <span className="kicker">Ecosystem fit</span>
-          <h2 className="h-1" style={{ marginTop: 18 }}>Built native on every standard<br />Arbitrum shipped this year.</h2>
+          <h2 className="h1" style={{ marginTop: 18 }}>Built native on every standard<br />Arbitrum shipped this year.</h2>
         </div>
         <div className="eco-grid">
           {ECO.map((e, i) => (
@@ -689,11 +679,11 @@ export function FinalCTA({ onConnect }: FinalCTAProps) {
       <div className="wrap" style={{ textAlign: 'center', position: 'relative' }}>
         <div className="reveal">
           <span className="kicker" style={{ justifyContent: 'center', display: 'inline-flex' }}>Where capital finds its pilot</span>
-          <h2 className="h-display" style={{ margin: '20px auto 0', maxWidth: 760, color: 'var(--deep-ink)' }}>
+          <h2 className="h-display" style={{ margin: '20px auto 0', maxWidth: 960, color: 'var(--deep-ink)' }}>
             Pick your pilot.<br />Keep the helm.
           </h2>
           <p className="lead" style={{ margin: '22px auto 0', maxWidth: 540 }}>
-            Browse the harbor anonymously, or deploy a non-custodial vault in one signature. The pilot works 24/7 — and can never sail outside your charter.
+            Browse the harbor anonymously, or deploy a non-custodial vault in one signature. The pilot works 24/7, and can never sail outside your charter.
           </p>
           <div style={{ display: 'flex', gap: 14, justifyContent: 'center', marginTop: 34, flexWrap: 'wrap' }}>
             <a className="btn btn-primary btn-lg" href="#harbor"><Icon name="compass" size={19} /> Browse the harbor</a>
