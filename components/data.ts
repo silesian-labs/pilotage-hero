@@ -1,3 +1,5 @@
+import { useState, useEffect } from 'react';
+
 /* ============================================================
    PILOTAGE — mock data + helpers
    ============================================================ */
@@ -97,7 +99,7 @@ export const PILOTS: Pilot[] = [
     color: '#1F9DAE', risk: 'high', chain: 'Arbitrum', assets: 'Perps',
     score: 54, tvl: 280_000, apy: 22.4, captains: 12, age: 'untested waters',
     compliance: 94, drawdown: -19.3, fee: 20,
-    blurb: 'Momentum perps on majors. New to the harbor — sailing to earn its Pilotage Score.',
+    blurb: 'Momentum perps on majors. New to the harbor, sailing to earn its Pilotage Score.',
     spark: series(60, 40, 16, false),
     tagset: ['GMX V2', 'Momentum', 'New'],
   },
@@ -113,11 +115,11 @@ export interface FeedItem {
 }
 
 export const DEMO_FEED: FeedItem[] = [
-  { kind: 'watch', marker: '#6E909B', ttl: 'Watching vault — all positions on course', sub: 'Drift 1.2% · within charter band', ts: '09:41:02' },
+  { kind: 'watch', marker: '#6E909B', ttl: 'Watching vault, all positions on course', sub: 'Drift 1.2% · within charter band', ts: '09:41:02' },
   { kind: 'detect', marker: '#C98A2B', ttl: 'Drift detected on TSLA exposure', sub: 'TSLA −8.0% · allocation now 33% vs 40% target', ts: '09:41:18' },
   { kind: 'compute', marker: '#1F9DAE', ttl: 'Computing safe passage', sub: 'CharterValidator preflight · 3 venues whitelisted', ts: '09:41:20' },
-  { kind: 'submit', marker: '#2E6E8E', ttl: 'Submitting rebalance — buy 7% TSLA', sub: 'Swap aUSDC → TSLA · slippage 0.3% · gas sponsored', ts: '09:41:24', tx: '0x9f2a…c41e' },
-  { kind: 'safe', marker: '#2C8A5B', ttl: 'Safe passage — back on course', sub: 'Allocation restored to 60/40 · drift 0.4%', ts: '09:41:31' },
+  { kind: 'submit', marker: '#2E6E8E', ttl: 'Submitting rebalance, buy 7% TSLA', sub: 'Swap aUSDC → TSLA · slippage 0.3% · gas sponsored', ts: '09:41:24', tx: '0x9f2a…c41e' },
+  { kind: 'safe', marker: '#2C8A5B', ttl: 'Safe passage, back on course', sub: 'Allocation restored to 60/40 · drift 0.4%', ts: '09:41:31' },
 ];
 
 export const HOLDINGS = [
@@ -142,3 +144,44 @@ export const TICKER = [
   { k: 'Charter violations blocked', v: '312' },
   { k: 'Avg Pilotage Score', v: '79 / 100' },
 ];
+
+export const getEnvUrls = () => {
+  const envLanding = process.env.NEXT_PUBLIC_LANDING_URL;
+  const envDashboard = process.env.NEXT_PUBLIC_DASHBOARD_URL;
+  
+  if (envLanding && envDashboard) {
+    return {
+      landing: envLanding,
+      dashboard: envDashboard,
+    };
+  }
+
+  const isLocal = typeof window !== 'undefined' && 
+    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.port === '3000' || window.location.port === '3001');
+  
+  if (isLocal) {
+    return {
+      landing: 'http://localhost:3000',
+      dashboard: 'http://localhost:3001',
+    };
+  }
+  return {
+    landing: 'https://pilotage.arb.vercel.app',
+    dashboard: 'https://pilotage-dashboard.arb.vercel.app',
+  };
+};
+
+export function useEnvUrls() {
+  const [urls, setUrls] = useState({
+    landing: 'https://pilotage.arb.vercel.app',
+    dashboard: 'https://pilotage-dashboard.arb.vercel.app',
+  });
+
+  useEffect(() => {
+    setUrls(getEnvUrls());
+  }, []);
+
+  return urls;
+}
+
+

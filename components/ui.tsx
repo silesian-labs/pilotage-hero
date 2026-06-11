@@ -1,6 +1,9 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
+import { useEnvUrls } from './data';
+
+
 
 // ---------- Icon (simple geometric line set) ----------
 export const ICONS: Record<string, string> = {
@@ -60,13 +63,17 @@ export function Mark({ size = 36 }: { size?: number }) {
 }
 
 export function Brand({ size = 36 }: { size?: number }) {
+  const urls = useEnvUrls();
+  const landingUrl = urls.landing;
   return (
-    <a href="#top" className="brand">
+    <a href={landingUrl} className="brand">
       <Mark size={size} />
       <span className="brand-name">Pilotage<span className="dot">.</span></span>
     </a>
   );
 }
+
+
 
 // ---------- Score ring ----------
 export function ScoreRing({ value, size = 72, stroke = 7, label = 'score' }: { value: number; size?: number; stroke?: number; label?: string }) {

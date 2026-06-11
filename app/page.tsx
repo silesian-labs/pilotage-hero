@@ -11,10 +11,8 @@ import {
   LiveDemo,
   Harbor,
   HowItWorks,
-  Builders,
   Ecosystem,
   FinalCTA,
-  Footer
 } from '../components/sections';
 interface ConnectModalProps {
   onClose: () => void;
@@ -75,10 +73,8 @@ export default function Home() {
       <LiveDemo />
       <Harbor onHire={onConnect} />
       <HowItWorks onConnect={onConnect} />
-      <Builders />
       <Ecosystem />
       <FinalCTA onConnect={onConnect} />
-      {/* <Footer /> */}
 
       {modal && <ConnectModal onClose={() => setModal(false)} onConnect={doConnect} />}
     </>

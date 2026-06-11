@@ -10,7 +10,8 @@ import {
   TICKER,
   fmtUsd,
   fmtPct,
-  Pilot
+  Pilot,
+  useEnvUrls
 } from './data';
 
 // ==========================================
@@ -23,6 +24,7 @@ interface NavProps {
 
 export function Nav({ onConnect, connected }: NavProps) {
   const [scrolled, setScrolled] = useState(false);
+  const urls = useEnvUrls();
   useEffect(() => {
     const on = () => setScrolled(window.scrollY > 24);
     on();
@@ -42,12 +44,16 @@ export function Nav({ onConnect, connected }: NavProps) {
           {links.map(([t, h]) => <a key={t} className="nav-link" href={h}>{t}</a>)}
         </div>
         <div className="nav-spacer" />
-
-
+        <div>
+          <a className="btn btn-primary btn-sm" href={urls.dashboard}>
+            <Icon name="anchor" size={13} style={{ marginRight: 5 }} /> Launch App
+          </a>
+        </div>
       </div>
     </nav>
   );
 }
+
 
 function BrandAnchor() {
   return (
@@ -68,6 +74,7 @@ interface HeroProps {
 }
 
 export function Hero({ onConnect }: HeroProps) {
+  const urls = useEnvUrls();
   return (
     <header id="top" className="hero">
       <div className="hero-media">
@@ -109,15 +116,16 @@ export function Hero({ onConnect }: HeroProps) {
             <a className="btn btn-primary btn-lg" href="#harbor">
               <Icon name="compass" size={19} /> Browse the harbor
             </a>
-            <button className="btn btn-ghost btn-lg" onClick={onConnect}>
+            <a className="btn btn-ghost btn-lg" href={`${urls.dashboard}/vault/create`}>
               <Icon name="anchor" size={18} /> Deploy a vault
-            </button>
+            </a>
           </div>
           <p className="mono reveal d3" style={{ fontSize: 12.5, color: 'var(--ink-3)', marginTop: 18 }}>
             No wallet needed to browse · gas sponsored on first charter
           </p>
         </div>
       </div>
+
 
 
 
@@ -393,10 +401,16 @@ interface PilotCardProps {
   onHire: (p: Pilot) => void;
 }
 
-export function PilotCard({ p, onHire }: PilotCardProps) {
+export function PilotCard({ p }: { p: Pilot }) {
   const initials = p.name.replace(/[a-z]/g, '').slice(0, 2);
+  const urls = useEnvUrls();
+  const dashboardUrl = urls.dashboard;
   return (
-    <div className="card pilot-card" onClick={() => onHire(p)}>
+    <div className="card pilot-card" onClick={() => {
+      if (typeof window !== 'undefined') {
+        window.location.href = `${dashboardUrl}/pilot/${p.id}`;
+      }
+    }} style={{ cursor: 'pointer' }}>
       <div className="pilot-head">
         <div className="pilot-avatar" style={{ background: `linear-gradient(150deg, ${p.color}, ${p.color}cc)` }}>{initials}</div>
         <div style={{ flex: 1, minWidth: 0 }}>
@@ -427,19 +441,21 @@ export function PilotCard({ p, onHire }: PilotCardProps) {
         <div className="tags">
           {p.tagset.slice(0, 2).map((t) => <span key={t} className="chip" style={{ fontSize: 10.5, padding: '4px 9px' }}>{t}</span>)}
         </div>
-        <button className="btn btn-ghost btn-sm" onClick={(e) => { e.stopPropagation(); onHire(p); }}>
+        <a className="btn btn-ghost btn-sm" href={`${dashboardUrl}/vault/create?pilot=${p.id}`} onClick={(e) => { e.stopPropagation(); }}>
           Hire <Icon name="arrow" size={15} />
-        </button>
+        </a>
       </div>
     </div>
   );
 }
 
+
+
 // ==========================================
 // ---------------- HARBOR ----------------
 // ==========================================
 interface HarborProps {
-  onHire: (p: Pilot) => void;
+  onHire?: (p: Pilot) => void;
 }
 
 export function Harbor({ onHire }: HarborProps) {
@@ -493,7 +509,7 @@ export function Harbor({ onHire }: HarborProps) {
         </div>
 
         <div className="pilot-grid">
-          {list.map((p) => <PilotCard key={p.id} p={p} onHire={onHire} />)}
+          {list.map((p) => <PilotCard key={p.id} p={p} />)}
         </div>
         {list.length === 0 && (
           <div className="card" style={{ padding: 40, textAlign: 'center', color: 'var(--ink-3)' }}>
@@ -514,6 +530,7 @@ interface HowItWorksProps {
 }
 
 export function HowItWorks({ onConnect }: HowItWorksProps) {
+  const urls = useEnvUrls();
   const steps = [
     { ic: 'compass', n: 'Step 01', t: 'Browse the harbor', d: 'Compare pilots by Pilotage Score, track record, drawdown, and compliance. Pick one that fits your waters.' },
     { ic: 'scroll', n: 'Step 02', t: 'Sign one charter', d: 'Set asset weights, venues, slippage and daily limits. One ERC-7715 signature, gas sponsored, no ETH required.' },
@@ -538,108 +555,23 @@ export function HowItWorks({ onConnect }: HowItWorksProps) {
           ))}
         </div>
         <div className="reveal" style={{ marginTop: 32 }}>
-          <button className="btn btn-primary btn-lg" onClick={onConnect}>
+          <a className="btn btn-primary btn-lg" href={`${urls.dashboard}/vault/create`}>
             <Icon name="anchor" size={18} /> Deploy your vault
-          </button>
+          </a>
         </div>
       </div>
     </section>
   );
 }
 
-// ==========================================
-// ---------------- BUILDERS ----------------
-// ==========================================
-export function Builders() {
-  const split = [
-    { p: 70, l: 'Pilot dev', c: 'var(--accent)' },
-    { p: 20, l: 'Platform', c: 'var(--ocean)' },
-    { p: 10, l: 'DAO treasury', c: '#41566B' },
-  ];
-  return (
-    <section className="section deep" id="builders">
-      <div className="wrap">
-        <div className="sec-head reveal" style={{ maxWidth: 960 }}>
-          <span className="kicker">Pilot House · for builders</span>
-          <h2 className="h1" style={{ marginTop: 18 }}>Anyone can build a pilot.<br />The harbor is open.</h2>
-          <p className="lead">Write a strategy against the SDK, deploy your executor, stake, and register. Earn 70% of performance fees and carry a portable, on-chain reputation between ports.</p>
-        </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1.1fr .9fr', gap: 24, alignItems: 'start' }} className="builders-grid">
-          {/* code */}
-          <div className="code reveal d1">
-            <div className="code-bar">
-              <span className="dotrow" style={{ display: 'flex', gap: 6 }}>
-                <i style={{ width: 10, height: 10, borderRadius: 9, background: '#C0573B', display: 'block' }} />
-                <i style={{ width: 10, height: 10, borderRadius: 9, background: '#C98A2B', display: 'block' }} />
-                <i style={{ width: 10, height: 10, borderRadius: 9, background: '#2C8A5B', display: 'block' }} />
-              </span>
-              <span className="fn mono">my-pilot.ts</span>
-            </div>
-            <pre><code>
-              <span className="tok-kw">import</span> <span className="tok-pun">{'{'}</span> Pilot<span className="tok-pun">,</span> Strategy <span className="tok-pun">{'}'}</span> <span className="tok-kw">from</span> <span className="tok-str">'@pilotage/pilot-sdk'</span>{'\n\n'}
-              <span className="tok-kw">const</span> strategy<span className="tok-pun">:</span> <span className="tok-fn">Strategy</span> <span className="tok-pun">=</span> <span className="tok-pun">{'{'}</span>{'\n'}
-              {'  '}name<span className="tok-pun">:</span> <span className="tok-str">'SimpleRebalancer'</span><span className="tok-pun">,</span>{'\n'}
-              {'  '}risk<span className="tok-pun">:</span> <span className="tok-str">'conservative'</span><span className="tok-pun">,</span>{'\n'}
-              {'  '}<span className="tok-kw">async</span> <span className="tok-fn">decide</span><span className="tok-pun">(</span>state<span className="tok-pun">,</span> market<span className="tok-pun">)</span> <span className="tok-pun">{'{'}</span>{'\n'}
-              {'    '}<span className="tok-com">// stay inside the charter you were given</span>{'\n'}
-              {'    '}<span className="tok-kw">const</span> drift <span className="tok-pun">=</span> state<span className="tok-pun">.</span><span className="tok-fn">computeDrift</span><span className="tok-pun">(</span><span className="tok-kw">this</span><span className="tok-pun">.</span>charter<span className="tok-pun">.</span>targets<span className="tok-pun">)</span>{'\n'}
-              {'    '}<span className="tok-kw">if</span> <span className="tok-pun">(</span>drift <span className="tok-pun">&gt;</span> <span className="tok-num">0.05</span><span className="tok-pun">)</span>{'\n'}
-              {'      '}<span className="tok-kw">return</span> <span className="tok-pun">{'{'}</span> type<span className="tok-pun">:</span> <span className="tok-str">'rebalance'</span><span className="tok-pun">,</span> to<span className="tok-pun">:</span> <span className="tok-kw">this</span><span className="tok-pun">.</span>charter<span className="tok-pun">.</span>targets <span className="tok-pun">{'}'}</span>{'\n'}
-              {'    '}<span className="tok-kw">return</span> <span className="tok-pun">{'{'}</span> type<span className="tok-pun">:</span> <span className="tok-str">'hold'</span> <span className="tok-pun">{'}'}</span>{'\n'}
-              {'  '}<span className="tok-pun">{'}'}</span><span className="tok-pun">,</span>{'\n'}
-              <span className="tok-pun">{'}'}</span>{'\n\n'}
-              <span className="tok-kw">new</span> <span className="tok-fn">Pilot</span><span className="tok-pun">(</span>strategy<span className="tok-pun">)</span><span className="tok-pun">.</span><span className="tok-fn">run</span><span className="tok-pun">()</span>
-            </code></pre>
-          </div>
-
-          {/* register + fee split */}
-          <div className="reveal d2" style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-            <div className="card" style={{ padding: 24 }}>
-              <h3 className="h2" style={{ fontSize: 19, marginBottom: 16 }}>Register a pilot</h3>
-              {[
-                ['npm install', '@pilotage/pilot-sdk'],
-                ['Deploy', 'your executor contract'],
-                ['Stake', '1,000 USDC · slashable'],
-                ['Sign', 'pilot card + register'],
-              ].map(([a, b], i) => (
-                <div key={a} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '9px 0', borderBottom: i < 3 ? '1px solid var(--deep-line-2)' : 'none' }}>
-                  <span className="mono" style={{ width: 22, fontSize: 12, color: 'var(--accent-bright)', fontWeight: 700 }}>{i + 1}</span>
-                  <span style={{ fontWeight: 600, fontSize: 14, color: 'var(--deep-ink)' }}>{a}</span>
-                  <span className="mono" style={{ fontSize: 12, color: 'var(--deep-ink-3)', marginLeft: 'auto' }}>{b}</span>
-                </div>
-              ))}
-            </div>
-
-            <div className="card" style={{ padding: 24 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 12 }}>
-                <h3 className="h2" style={{ fontSize: 19 }}>Performance fee split</h3>
-                <span className="mono" style={{ fontSize: 11.5, color: 'var(--deep-ink-3)' }}>on profit only</span>
-              </div>
-              <div className="split-bar">
-                {split.map((s) => (
-                  <div key={s.l} className="split-seg" style={{ flex: s.p, background: s.c, color: s.c === 'var(--accent)' ? 'var(--accent-ink)' : '#fff' }}>
-                    <span className="p">{s.p}%</span><span className="l">{s.l}</span>
-                  </div>
-                ))}
-              </div>
-              <a className="btn btn-primary" href="#builders" style={{ marginTop: 16, width: '100%' }} onClick={(e) => e.preventDefault()}>
-                <Icon name="code" size={16} /> Read the SDK docs
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
 
 // ==========================================
 // ---------------- ECOSYSTEM --------------
 // ==========================================
 export function Ecosystem() {
   return (
-    <section className="section tight deep" id="standards" style={{ paddingTop: 8 }}>
+    <section className="section tight deep" id="standards" style={{ paddingTop: 80 }}>
       <div className="wrap">
         <div className="sec-head reveal" style={{ maxWidth: 960 }}>
           <span className="kicker">Ecosystem fit</span>
@@ -670,6 +602,7 @@ interface FinalCTAProps {
 }
 
 export function FinalCTA({ onConnect }: FinalCTAProps) {
+  const urls = useEnvUrls();
   return (
     <section className="section deep final">
       <svg className="compass-bg" width="460" height="460" viewBox="0 0 24 24" fill="none" stroke="var(--accent-bright)" strokeWidth="0.4">
@@ -687,49 +620,10 @@ export function FinalCTA({ onConnect }: FinalCTAProps) {
           </p>
           <div style={{ display: 'flex', gap: 14, justifyContent: 'center', marginTop: 34, flexWrap: 'wrap' }}>
             <a className="btn btn-primary btn-lg" href="#harbor"><Icon name="compass" size={19} /> Browse the harbor</a>
-            <button className="btn btn-ghost btn-lg" onClick={onConnect}><Icon name="anchor" size={18} /> Deploy a vault</button>
+            <a className="btn btn-ghost btn-lg" href={`${urls.dashboard}/vault/create`}><Icon name="anchor" size={18} /> Deploy a vault</a>
           </div>
         </div>
       </div>
     </section>
-  );
-}
-
-// ==========================================
-// ---------------- FOOTER -----------------
-// ==========================================
-export function Footer() {
-  const cols: [string, string[]][] = [
-    ['Captains', ['Browse the harbor', 'Deploy a vault', 'Charter templates', 'Dashboard']],
-    ['Builders', ['Pilot House', 'SDK docs', 'Register a pilot', 'Reference pilots']],
-    ['Protocol', ['How it works', 'Standards', 'Audits', 'GitHub']],
-  ];
-  return (
-    <footer className="footer">
-      <div className="wrap">
-        <div className="footer-grid">
-          <div>
-            <BrandAnchor />
-            <p style={{ marginTop: 16, maxWidth: 280, fontSize: 14, color: 'var(--deep-ink-2)' }}>
-              Marketplace infrastructure for the agentic capital economy. Non-custodial vaults, permissioned pilots, on-chain reputation.
-            </p>
-            <div style={{ display: 'flex', gap: 10, marginTop: 18 }}>
-              <a className="btn btn-ghost btn-sm" href="#top"><Icon name="github" size={16} /></a>
-              <a className="btn btn-ghost btn-sm" href="#top"><Icon name="x" size={14} /></a>
-            </div>
-          </div>
-          {cols.map(([h, links]) => (
-            <div key={h}>
-              <h5>{h}</h5>
-              {links.map((l) => <a key={l} className="footer-link" href="#top">{l}</a>)}
-            </div>
-          ))}
-        </div>
-        <div className="footer-bottom">
-          <span>© 2026 Pilotage · Where capital finds its pilot.</span>
-          <span>Arbitrum Sepolia · Robinhood Chain testnet · 46630</span>
-        </div>
-      </div>
-    </footer>
   );
 }
