@@ -157,24 +157,24 @@ export const getEnvUrls = () => {
   }
 
   const isLocal = typeof window !== 'undefined' && 
-    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.port === '3000' || window.location.port === '3001');
+    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.port === '3000' || window.location.port === '3001' || window.location.port === '3002');
   
   if (isLocal) {
     return {
       landing: 'http://localhost:3000',
-      dashboard: 'http://localhost:3001',
+      dashboard: 'http://localhost:3002',
     };
   }
   return {
     landing: 'https://pilotage.arb.vercel.app',
-    dashboard: 'https://pilotage-dashboard.arb.vercel.app',
+    dashboard: 'https://pilotage-dashboard.onrender.com',
   };
 };
 
 export function useEnvUrls() {
   const [urls, setUrls] = useState({
     landing: 'https://pilotage.arb.vercel.app',
-    dashboard: 'https://pilotage-dashboard.arb.vercel.app',
+    dashboard: 'https://pilotage-dashboard.onrender.com',
   });
 
   useEffect(() => {
@@ -182,6 +182,21 @@ export function useEnvUrls() {
   }, []);
 
   return urls;
+}
+
+// Helper to enrich API pilots with mock UI data
+export function enrichApiPilot(api: any): Pilot {
+  // Use modulo arithmetic to pick consistent aesthetic properties for any ID
+  const fallback = PILOTS[api.id % PILOTS.length] || PILOTS[0];
+  
+  return {
+    ...fallback,
+    id: api.id.toString(),
+    name: api.name || `Pilot #${api.id}`,
+    risk: (api.risk_profile === 'conservative' ? 'low' : api.risk_profile === 'high' ? 'high' : 'balanced') as any,
+    score: api.pilotage_score ?? 50,
+    handle: api.operator ? `${api.operator.substring(0,6)}...${api.operator.substring(38)}` : fallback.handle,
+  };
 }
 
 

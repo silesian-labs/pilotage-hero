@@ -11,8 +11,10 @@ import {
   fmtUsd,
   fmtPct,
   Pilot,
-  useEnvUrls
+  useEnvUrls,
+  enrichApiPilot
 } from './data';
+import { fetchPilots, fetchStats } from '../lib/api';
 
 // ==========================================
 // ---------------- NAV ----------------
@@ -140,7 +142,32 @@ export function Hero({ onConnect }: HeroProps) {
 // ---------------- TICKER ----------------
 // ==========================================
 export function Ticker() {
-  const row = [...TICKER, ...TICKER];
+  const [stats, setStats] = useState({
+    vaults: 0,
+    activePilots: 0,
+    successfulActions: 0
+  });
+
+  useEffect(() => {
+    fetchStats().then(data => {
+      if (data) {
+        setStats(data);
+      }
+    });
+  }, []);
+
+  const dynamicTicker = useMemo(() => {
+    return [
+      { k: 'Total value piloted', v: '$14.3M' },
+      { k: 'Active pilots', v: stats.activePilots > 0 ? stats.activePilots.toString() : '38' },
+      { k: 'Captains aboard', v: stats.vaults > 0 ? stats.vaults.toString() : '991' },
+      { k: 'Safe passages', v: stats.successfulActions > 0 ? stats.successfulActions.toLocaleString() : '124,807' },
+      { k: 'Charter violations blocked', v: '312' },
+      { k: 'Avg Pilotage Score', v: '79 / 100' },
+    ];
+  }, [stats]);
+
+  const row = [...dynamicTicker, ...dynamicTicker];
   return (
     <div className="ticker">
       <div className="ticker-track">
@@ -459,6 +486,20 @@ interface HarborProps {
 }
 
 export function Harbor({ onHire }: HarborProps) {
+  const [pilots, setPilots] = useState<Pilot[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchPilots().then(data => {
+      if (data && data.length > 0) {
+        setPilots(data.map(enrichApiPilot));
+      } else {
+        setPilots(PILOTS);
+      }
+      setLoading(false);
+    });
+  }, []);
+
   const [risk, setRisk] = useState('all');
   const [chain, setChain] = useState('all');
   const [sort, setSort] = useState<'score' | 'tvl' | 'apy' | 'captains'>('score');
@@ -467,7 +508,7 @@ export function Harbor({ onHire }: HarborProps) {
   const chainOpts = [['all', 'All chains'], ['Arbitrum', 'Arbitrum'], ['Robinhood Chain', 'Robinhood']];
 
   const list = useMemo(() => {
-    const l = PILOTS.filter((p) => (risk === 'all' || p.risk === risk) && (chain === 'all' || p.chain === chain));
+    const l = pilots.filter((p) => (risk === 'all' || p.risk === risk) && (chain === 'all' || p.chain === chain));
     const by: Record<string, (a: Pilot, b: Pilot) => number> = {
       score: (a, b) => b.score - a.score,
       tvl: (a, b) => b.tvl - a.tvl,
@@ -475,7 +516,7 @@ export function Harbor({ onHire }: HarborProps) {
       captains: (a, b) => b.captains - a.captains
     };
     return [...l].sort(by[sort]);
-  }, [risk, chain, sort]);
+  }, [pilots, risk, chain, sort]);
 
   return (
     <section className="section" id="harbor">
@@ -508,14 +549,23 @@ export function Harbor({ onHire }: HarborProps) {
           </div>
         </div>
 
-        <div className="pilot-grid">
-          {list.map((p) => <PilotCard key={p.id} p={p} />)}
-        </div>
-        {list.length === 0 && (
+        {loading ? (
           <div className="card" style={{ padding: 40, textAlign: 'center', color: 'var(--ink-3)' }}>
-            <Icon name="compass" size={28} style={{ color: 'var(--ink-3)' }} />
-            <p style={{ marginTop: 10 }}>No pilots match these waters. Widen your filters.</p>
+            <Icon name="compass" size={28} className="spin" style={{ color: 'var(--ink-3)' }} />
+            <p style={{ marginTop: 10 }}>Searching the harbor for pilots...</p>
           </div>
+        ) : (
+          <>
+            <div className="pilot-grid">
+              {list.map((p) => <PilotCard key={p.id} p={p} />)}
+            </div>
+            {list.length === 0 && (
+              <div className="card" style={{ padding: 40, textAlign: 'center', color: 'var(--ink-3)' }}>
+                <Icon name="compass" size={28} style={{ color: 'var(--ink-3)' }} />
+                <p style={{ marginTop: 10 }}>No pilots match these waters. Widen your filters.</p>
+              </div>
+            )}
+          </>
         )}
       </div>
     </section>
