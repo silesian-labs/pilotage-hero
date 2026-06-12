@@ -1,13 +1,12 @@
 "use client";
 
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { Icon, ScoreRing, Sparkline, RiskPill, Wave } from './ui';
 import {
   PILOTS,
   DEMO_FEED,
   HOLDINGS,
   ECO,
-  TICKER,
   fmtUsd,
   fmtPct,
   Pilot,
@@ -16,15 +15,7 @@ import {
 } from './data';
 import { fetchPilots, fetchStats } from '../lib/api';
 
-// ==========================================
-// ---------------- NAV ----------------
-// ==========================================
-interface NavProps {
-  onConnect: () => void;
-  connected: boolean;
-}
-
-export function Nav({ onConnect, connected }: NavProps) {
+export function Nav() {
   const [scrolled, setScrolled] = useState(false);
   const urls = useEnvUrls();
   useEffect(() => {
@@ -68,14 +59,8 @@ function BrandAnchor() {
   );
 }
 
-// ==========================================
-// ---------------- HERO ----------------
-// ==========================================
-interface HeroProps {
-  onConnect: () => void;
-}
 
-export function Hero({ onConnect }: HeroProps) {
+export function Hero() {
   const urls = useEnvUrls();
   return (
     <header id="top" className="hero">
@@ -478,14 +463,8 @@ export function PilotCard({ p }: { p: Pilot }) {
 
 
 
-// ==========================================
-// ---------------- HARBOR ----------------
-// ==========================================
-interface HarborProps {
-  onHire?: (p: Pilot) => void;
-}
 
-export function Harbor({ onHire }: HarborProps) {
+export function Harbor() {
   const [pilots, setPilots] = useState<Pilot[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -572,14 +551,8 @@ export function Harbor({ onHire }: HarborProps) {
   );
 }
 
-// ==========================================
-// ---------------- HOW IT WORKS -------------
-// ==========================================
-interface HowItWorksProps {
-  onConnect: () => void;
-}
 
-export function HowItWorks({ onConnect }: HowItWorksProps) {
+export function HowItWorks() {
   const urls = useEnvUrls();
   const steps = [
     { ic: 'compass', n: 'Step 01', t: 'Browse the harbor', d: 'Compare pilots by Pilotage Score, track record, drawdown, and compliance. Pick one that fits your waters.' },
@@ -644,14 +617,8 @@ export function Ecosystem() {
   );
 }
 
-// ==========================================
-// ---------------- FINAL CTA --------------
-// ==========================================
-interface FinalCTAProps {
-  onConnect: () => void;
-}
 
-export function FinalCTA({ onConnect }: FinalCTAProps) {
+export function FinalCTA() {
   const urls = useEnvUrls();
   return (
     <section className="section deep final">
