@@ -3,15 +3,16 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { Icon, ScoreRing, Sparkline, RiskPill, Wave } from './ui';
 import {
-  PILOTS,
   DEMO_FEED,
   HOLDINGS,
   ECO,
   fmtUsd,
-  fmtPct,
   Pilot,
   useEnvUrls,
-  enrichApiPilot
+  enrichApiPilot,
+  pilotColor,
+  initialsOf,
+  toUiRisk,
 } from './data';
 import { fetchPilots, fetchStats } from '../lib/api';
 
@@ -83,7 +84,7 @@ export function Hero() {
               <span className="pulse" />
             </span>
             <span className="mono" style={{ fontSize: 12.5, letterSpacing: '.04em' }}>
-              Live on Arbitrum &amp; Robinhood Chain testnet
+              Live on Arbitrum Sepolia testnet
             </span>
           </span>
           <h1 className="h-display reveal d1">
@@ -108,7 +109,7 @@ export function Hero() {
             </a>
           </div>
           <p className="mono reveal d3" style={{ fontSize: 12.5, color: 'var(--ink-3)', marginTop: 18 }}>
-            No wallet needed to browse · gas sponsored on first charter
+            No wallet needed to browse · non-custodial · charter-bounded
           </p>
         </div>
       </div>
@@ -141,14 +142,15 @@ export function Ticker() {
     });
   }, []);
 
+  // Live values come from the indexer; the rest are fixed facts about the stack.
   const dynamicTicker = useMemo(() => {
     return [
-      { k: 'Total value piloted', v: '$14.3M' },
-      { k: 'Active pilots', v: stats.activePilots > 0 ? stats.activePilots.toString() : '38' },
-      { k: 'Captains aboard', v: stats.vaults > 0 ? stats.vaults.toString() : '991' },
-      { k: 'Safe passages', v: stats.successfulActions > 0 ? stats.successfulActions.toLocaleString() : '124,807' },
-      { k: 'Charter violations blocked', v: '312' },
-      { k: 'Avg Pilotage Score', v: '79 / 100' },
+      { k: 'Active pilots', v: stats.activePilots.toString() },
+      { k: 'Vaults deployed', v: stats.vaults.toString() },
+      { k: 'Safe passages', v: stats.successfulActions.toLocaleString() },
+      { k: 'Network', v: 'Arbitrum Sepolia' },
+      { k: 'Reputation', v: 'ERC-8004' },
+      { k: 'Yield venue', v: 'Aave V3' },
     ];
   }, [stats]);
 
@@ -224,8 +226,8 @@ export function Problem() {
 export function Pillars() {
   const items = [
     { ic: 'lock', n: '01', t: 'Non-custodial vaults', d: 'You deploy your own smart-contract vault. Only you hold the keys. One “withdraw all” and funds return to your wallet, Pilotage has zero privileged calls.' },
-    { ic: 'key', n: '02', t: 'Permissioned pilots', d: 'Sign an ERC-7715 charter: which contracts, which amounts, how often, what slippage. A pilot physically cannot act outside it, every attempt reverts on-chain.' },
-    { ic: 'badge', n: '03', t: 'On-chain Pilotage Score', d: 'Every passage, every rebalance, every off-course is recorded via ERC-8004. Pilots compete on a public track record, not on marketing.' },
+    { ic: 'key', n: '02', t: 'Permissioned pilots', d: 'Sign an on-chain charter: which contracts, which tokens, the per-action and daily spend caps, the expiry. The vault enforces it — every out-of-bounds attempt reverts.' },
+    { ic: 'badge', n: '03', t: 'On-chain Pilotage Score', d: 'Every successful, charter-bounded execution posts +1 via ERC-8004. Pilots compete on a public, verifiable track record, not on marketing.' },
   ];
   return (
     <section className="section tight" id="how">
@@ -279,14 +281,15 @@ export function LiveDemo() {
 
   const reset = () => { clearAll(); setRunning(false); setStep(0); setShown(1); };
 
-  // derived state
-  const drift = step >= 4 ? 0.4 : step >= 3 ? 3.4 : step >= 1 ? 7.6 : 1.2;
+  // derived state — aUSDC marked up → overweight → pilot withdraws back to ~50/50
+  const drift = step >= 4 ? 0.4 : step >= 3 ? 3.4 : step >= 1 ? 8.0 : 0.0;
   const driftPct = Math.min(100, (drift / 8) * 100);
   const driftColor = drift < 2 ? 'var(--pos)' : drift < 5 ? 'var(--warn)' : 'var(--neg)';
-  const tsla = step >= 4 ? 40 : step >= 3 ? 37 : step >= 1 ? 33 : 40;
-  const usdc = 100 - tsla;
-  const alloc: Record<string, number> = { aUSDC: usdc, TSLA: tsla };
-  const score = step >= 4 ? 87.1 : 87.0;
+  const aUsdc = step >= 4 ? 50 : step >= 3 ? 54 : step >= 1 ? 58 : 50;
+  const usdc = 100 - aUsdc;
+  const alloc: Record<string, number> = { USDC: usdc, aUSDC: aUsdc };
+  // ERC-8004 score increments by exactly +1 on a successful execution (real behavior).
+  const score = step >= 4 ? 6 : 5;
   const statusLabel = step >= 4 ? ['Safe passage', 'var(--pos)']
     : step >= 1 ? ['Off-course, correcting', 'var(--warn)']
       : ['On course', 'var(--pos)'];
@@ -299,7 +302,7 @@ export function LiveDemo() {
           <div className="sec-head reveal" style={{ maxWidth: 960 }}>
             <span className="kicker">Watch the helm</span>
             <h2 className="h1" style={{ marginTop: 18 }}>The market moves. The pilot acts.<br />You don't lift a finger.</h2>
-            <p className="lead">Drop the price of tokenized Tesla and watch a pilot detect the drift, validate against its charter, and navigate back on course, on-chain, in seconds, inside the rails you signed.</p>
+            <p className="lead">Mark aUSDC up and watch the pilot detect the drift, ask its AI decision engine how far to correct, validate against the charter, and rebalance USDC/aUSDC on Aave — on-chain, in seconds, inside the rails you signed.</p>
           </div>
 
           <div className="demo-grid">
@@ -335,17 +338,18 @@ export function LiveDemo() {
             <div className="console reveal d2" style={{ padding: 0, display: 'flex', flexDirection: 'column' }}>
               <div className="console-bar">
                 <Icon name="anchor" size={15} style={{ color: 'var(--accent-bright)' }} />
-                <span className="console-title">vault · 0xA4…ce2f</span>
-                <span className="ts mono" style={{ marginLeft: 'auto', color: 'var(--deep-ink-3)', fontSize: 11 }}>Robinhood Chain</span>
+                <span className="console-title">vault · 0x5A6C…3bfe</span>
+                <span className="ts mono" style={{ marginLeft: 'auto', color: 'var(--deep-ink-3)', fontSize: 11 }}>Arbitrum Sepolia</span>
               </div>
 
               <div style={{ padding: '20px 20px 6px' }}>
                 {/* score + status */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 18 }}>
-                  <ScoreRing value={score} size={66} stroke={6} label="" />
                   <div style={{ flex: 1 }}>
-                    <div className="mono" style={{ fontSize: 10.5, letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--deep-ink-3)' }}>Pilotage Score</div>
-                    <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 22, color: 'var(--deep-ink)', transition: '.4s' }}>{score.toFixed(1)}</div>
+                    <div className="mono" style={{ fontSize: 10.5, letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--deep-ink-3)' }}>ERC-8004 Score</div>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 22, color: 'var(--deep-ink)', transition: '.4s' }}>
+                      {score}{step >= 4 && <span style={{ color: 'var(--pos)', fontSize: 13 }}> +1</span>}
+                    </div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
                     <div className="mono" style={{ fontSize: 10.5, letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--deep-ink-3)' }}>Status</div>
@@ -386,7 +390,7 @@ export function LiveDemo() {
 
               <div style={{ marginTop: 'auto', padding: '0 20px 20px', display: 'flex', gap: 10 }}>
                 <button className="btn btn-primary" style={{ flex: 1 }} onClick={run} disabled={running}>
-                  {running ? <><Icon name="route" size={16} /> Navigating…</> : <><Icon name="bolt" size={16} /> Drop TSLA −8%</>}
+                  {running ? <><Icon name="route" size={16} /> Navigating…</> : <><Icon name="bolt" size={16} /> Mark aUSDC +40%</>}
                 </button>
                 <button className="btn btn-ghost" onClick={reset} title="Reset demo">
                   <Icon name="compass" size={16} />
@@ -396,7 +400,7 @@ export function LiveDemo() {
           </div>
 
           <p className="mono reveal" style={{ textAlign: 'center', marginTop: 28, fontSize: 12.5, color: 'var(--deep-ink-3)' }}>
-            ~20 seconds · no human in the loop · pilot stayed within charter · verifiable on-chain
+            Illustration of the real flow · AI-sized · pilot stayed within charter · verifiable on-chain
           </p>
         </div>
       </section>
@@ -414,7 +418,6 @@ interface PilotCardProps {
 }
 
 export function PilotCard({ p }: { p: Pilot }) {
-  const initials = p.name.replace(/[a-z]/g, '').slice(0, 2);
   const urls = useEnvUrls();
   const dashboardUrl = urls.dashboard;
   return (
@@ -424,34 +427,30 @@ export function PilotCard({ p }: { p: Pilot }) {
       }
     }} style={{ cursor: 'pointer' }}>
       <div className="pilot-head">
-        <div className="pilot-avatar" style={{ background: `linear-gradient(150deg, ${p.color}, ${p.color}cc)` }}>{initials}</div>
+        <div className="pilot-avatar" style={{ background: `linear-gradient(150deg, ${p.color}, ${p.color}cc)` }}>{initialsOf(p.name)}</div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div className="pilot-name">{p.name}</div>
-          <div className="pilot-handle">{p.handle}</div>
+          <div className="pilot-handle mono">{p.handle}</div>
         </div>
-        <ScoreRing value={p.score} size={56} stroke={6} label="" />
+        <ScoreRing value={Math.min(100, Math.max(0, p.score))} size={56} stroke={6} label="" />
       </div>
 
-      <p style={{ color: 'var(--ink-2)', fontSize: 13.5, lineHeight: 1.5, minHeight: 40 }}>{p.blurb}</p>
+      <p style={{ color: 'var(--ink-2)', fontSize: 13.5, lineHeight: 1.5, minHeight: 40 }}>{p.description}</p>
 
       <div style={{ margin: '-2px -2px 0' }}>
         <Sparkline data={p.spark} h={46} color={p.color} sw={2} />
       </div>
 
       <div className="pilot-stats">
-        <div className="pstat"><div className="k">TVL</div><div className="v">{fmtUsd(p.tvl)}</div></div>
-        <div className="pstat"><div className="k">Net APY</div><div className="v pos">{fmtPct(p.apy)}</div></div>
-        <div className="pstat"><div className="k">Captains</div><div className="v">{p.captains}</div></div>
-      </div>
-
-      <div className="tags">
-        <RiskPill risk={p.risk} />
-        <span className="chip"><Icon name={p.chain === 'Arbitrum' ? 'layers' : 'stock'} size={12} />{p.chain}</span>
+        <div className="pstat"><div className="k">Score</div><div className="v">{p.score}</div></div>
+        <div className="pstat"><div className="k">Stake</div><div className="v">{fmtUsd(p.stakeUsd)}</div></div>
+        <div className="pstat"><div className="k">Tokens</div><div className="v">USDC·aUSDC</div></div>
       </div>
 
       <div className="pilot-foot">
         <div className="tags">
-          {p.tagset.slice(0, 2).map((t) => <span key={t} className="chip" style={{ fontSize: 10.5, padding: '4px 9px' }}>{t}</span>)}
+          <RiskPill risk={p.risk} />
+          <span className="chip"><Icon name="layers" size={12} /> Arbitrum Sepolia</span>
         </div>
         <a className="btn btn-ghost btn-sm" href={`${dashboardUrl}/vault/create?pilot=${p.id}`} onClick={(e) => { e.stopPropagation(); }}>
           Hire <Icon name="arrow" size={15} />
@@ -470,32 +469,24 @@ export function Harbor() {
 
   useEffect(() => {
     fetchPilots().then(data => {
-      if (data && data.length > 0) {
-        setPilots(data.map(enrichApiPilot));
-      } else {
-        setPilots(PILOTS);
-      }
+      setPilots(data.map(enrichApiPilot));
       setLoading(false);
     });
   }, []);
 
   const [risk, setRisk] = useState('all');
-  const [chain, setChain] = useState('all');
-  const [sort, setSort] = useState<'score' | 'tvl' | 'apy' | 'captains'>('score');
+  const [sort, setSort] = useState<'score' | 'stake'>('score');
 
   const riskOpts = [['all', 'All'], ['low', 'Calm'], ['balanced', 'Balanced'], ['high', 'High seas']];
-  const chainOpts = [['all', 'All chains'], ['Arbitrum', 'Arbitrum'], ['Robinhood Chain', 'Robinhood']];
 
   const list = useMemo(() => {
-    const l = pilots.filter((p) => (risk === 'all' || p.risk === risk) && (chain === 'all' || p.chain === chain));
+    const l = pilots.filter((p) => (risk === 'all' || p.risk === risk));
     const by: Record<string, (a: Pilot, b: Pilot) => number> = {
       score: (a, b) => b.score - a.score,
-      tvl: (a, b) => b.tvl - a.tvl,
-      apy: (a, b) => b.apy - a.apy,
-      captains: (a, b) => b.captains - a.captains
+      stake: (a, b) => b.stakeUsd - a.stakeUsd,
     };
     return [...l].sort(by[sort]);
-  }, [pilots, risk, chain, sort]);
+  }, [pilots, risk, sort]);
 
   return (
     <section className="section" id="harbor">
@@ -503,7 +494,7 @@ export function Harbor() {
         <div className="sec-head reveal" style={{ marginBottom: 32, maxWidth: 960 }}>
           <span className="kicker">The harbor</span>
           <h2 className="h1" style={{ marginTop: 18 }}>Browse pilots ranked by reputation,<br />not by marketing budget.</h2>
-          <p className="lead">Filter by risk, chain, and asset class. Every number here is computed from on-chain history, no wallet required to look around.</p>
+          <p className="lead">Every pilot is registered on-chain with a staked bond, and ranked by an ERC-8004 score earned one safe passage at a time. No wallet required to look around.</p>
         </div>
 
         <div className="harbor-toolbar reveal">
@@ -512,18 +503,11 @@ export function Harbor() {
               <button key={v} className={risk === v ? 'on' : ''} onClick={() => setRisk(v)}>{l}</button>
             ))}
           </div>
-          <div className="seg">
-            {chainOpts.map(([v, l]) => (
-              <button key={v} className={chain === v ? 'on' : ''} onClick={() => setChain(v)}>{l}</button>
-            ))}
-          </div>
           <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 10 }}>
-            <span className="mono" style={{ fontSize: 12, color: 'var(--ink-3)' }}>{list.length} pilots</span>
+            <span className="mono" style={{ fontSize: 12, color: 'var(--ink-3)' }}>{list.length} pilot{list.length === 1 ? '' : 's'}</span>
             <select className="sort-select" value={sort} onChange={(e) => setSort(e.target.value as any)}>
               <option value="score">Sort · Pilotage Score</option>
-              <option value="tvl">Sort · TVL</option>
-              <option value="apy">Sort · Net APY</option>
-              <option value="captains">Sort · Captains</option>
+              <option value="stake">Sort · Stake</option>
             </select>
           </div>
         </div>
@@ -555,10 +539,10 @@ export function Harbor() {
 export function HowItWorks() {
   const urls = useEnvUrls();
   const steps = [
-    { ic: 'compass', n: 'Step 01', t: 'Browse the harbor', d: 'Compare pilots by Pilotage Score, track record, drawdown, and compliance. Pick one that fits your waters.' },
-    { ic: 'scroll', n: 'Step 02', t: 'Sign one charter', d: 'Set asset weights, venues, slippage and daily limits. One ERC-7715 signature, gas sponsored, no ETH required.' },
-    { ic: 'coins', n: 'Step 03', t: 'Fund the vault', d: 'Deposit USDC or RWA into a vault only you can open. The pilot wakes the moment funds arrive.' },
-    { ic: 'wheel', n: 'Step 04', t: 'Keep the helm', d: 'Watch passages in real time. Revoke the pilot or withdraw everything in a single transaction, anytime.' },
+    { ic: 'compass', n: 'Step 01', t: 'Browse the harbor', d: 'Compare pilots by their ERC-8004 Pilotage Score, safe-passage count, and staked bond. Pick one that fits your waters.' },
+    { ic: 'scroll', n: 'Step 02', t: 'Sign one charter', d: 'Set the whitelisted venue and tokens, the per-action and daily spend caps, and an expiry. The vault enforces every limit on-chain.' },
+    { ic: 'coins', n: 'Step 03', t: 'Fund the vault', d: 'Deposit USDC into a vault only you can open. The pilot wakes the moment funds arrive.' },
+    { ic: 'wheel', n: 'Step 04', t: 'Keep the helm', d: 'Watch passages in real time. Pause, revoke the pilot, or force-withdraw everything in a single transaction, anytime.' },
   ];
   return (
     <section className="section tight">

@@ -2,7 +2,7 @@ const getApiUrl = () => {
   if (process.env.NEXT_PUBLIC_INDEXER_URL) {
     return process.env.NEXT_PUBLIC_INDEXER_URL;
   }
-  const isLocal = typeof window !== 'undefined' && 
+  const isLocal = typeof window !== 'undefined' &&
     (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
   return isLocal ? "http://localhost:3001" : "https://pilotage-indexer.onrender.com";
 };
@@ -12,18 +12,27 @@ const API_URL = getApiUrl();
 export interface ApiPilot {
   id: number;
   operator: string;
+  executor?: string;
+  developer?: string;
   active: boolean;
   slashed: boolean;
   registered_at: string;
-  risk_profile: string; // conservative, balanced, high
+  risk_profile: string; // conservative, steady-yield, balanced, aggressive…
+  staked_amount?: string; // 6-decimal USDC units
   pilotage_score?: number;
   name?: string;
   description?: string;
 }
 
+export interface ApiStats {
+  vaults: number;
+  activePilots: number;
+  successfulActions: number;
+}
+
 export async function fetchPilots(): Promise<ApiPilot[]> {
   try {
-    const res = await fetch(`${API_URL}/api/pilots?limit=100`, { next: { revalidate: 15 } });
+    const res = await fetch(`${API_URL}/api/pilots?limit=100`, { cache: "no-store" });
     if (!res.ok) throw new Error("Failed to fetch pilots");
     const data = await res.json();
     return data.pilots || [];
@@ -35,7 +44,7 @@ export async function fetchPilots(): Promise<ApiPilot[]> {
 
 export async function fetchPilot(id: number): Promise<ApiPilot | null> {
   try {
-    const res = await fetch(`${API_URL}/api/pilots/${id}`, { next: { revalidate: 15 } });
+    const res = await fetch(`${API_URL}/api/pilots/${id}`, { cache: "no-store" });
     if (!res.ok) throw new Error("Failed to fetch pilot");
     return await res.json();
   } catch (err) {
@@ -44,9 +53,9 @@ export async function fetchPilot(id: number): Promise<ApiPilot | null> {
   }
 }
 
-export async function fetchStats() {
+export async function fetchStats(): Promise<ApiStats> {
   try {
-    const res = await fetch(`${API_URL}/api/stats`, { next: { revalidate: 15 } });
+    const res = await fetch(`${API_URL}/api/stats`, { cache: "no-store" });
     if (!res.ok) throw new Error("Failed to fetch stats");
     return await res.json();
   } catch (err) {
